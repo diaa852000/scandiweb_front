@@ -78,24 +78,29 @@ export const CartCtxProvider = ({ children }: { children: ReactNode }) => {
 
 
     const decreaseQuantity = (id: string, attributes: Record<string, string>) => {
-        setItems((prev) =>
-            prev
-                .map((item) => {
-                    if (
-                        item.id === id &&
-                        JSON.stringify(item.attributes) === JSON.stringify(attributes)
-                    ) {
-                        // if quantity is 1 → remove
-                        if (item.quantity <= 1) {
-                            return null;
-                        }
-                        return { ...item, quantity: item.quantity - 1 };
+    setItems((prev) => {
+        const updatedItems = prev
+            .map((item) => {
+                if (
+                    item.id === id &&
+                    JSON.stringify(item.attributes) === JSON.stringify(attributes)
+                ) {
+                    // Remove item if quantity <= 1
+                    if (item.quantity <= 1) {
+                        return null;
                     }
-                    return item;
-                })
-                .filter(Boolean) as ICartItem[]
-        );
-    };
+                    return { ...item, quantity: item.quantity - 1 };
+                }
+                return item;
+            })
+            .filter(Boolean) as ICartItem[];
+
+        localStorage.setItem("cart-items", JSON.stringify(updatedItems));
+
+        return updatedItems;
+    });
+};
+
 
     const clearCart = () => {
         setItems([]);
